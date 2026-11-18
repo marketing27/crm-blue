@@ -1,0 +1,322 @@
+// use prisma-8
+
+model Tenant {
+  id                   Int       @id @default(autoincrement())
+  nombre               String
+  dominio              String?   @unique
+  configuracion        Json?
+  limite_leads_mensual Int       @default(10000)
+  permitir_excedentes  Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @onCreate(now()) @onUpdate(now())
+
+  // Relaciones
+  usuarios             User[]
+  apiKeys              ApiKey[]
+  leads                Lead[]
+  gestiones            Gestion[]
+  ventas               Venta[]
+  roles                Role[]
+  stages               Stage[]
+  comerciales          Comercial[]
+  indicadores_gestion  IndicadoresGestion[]
+
+  @@map("tenant")
+}
+
+model ApiKey {
+  id          Int      @id @default(autoincrement())
+  tenant_id   Int
+  key_hash    String
+  prefix      VarChar(8)
+  status      Boolean  @default(true)
+  allowed_ips String[] // Array de IPs permitidas
+  tenant      Tenant   @relation(fields: [tenant_id], references: [id])
+
+  @@map("api_keys")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  nombres       String
+  apellidos     String
+  correo        String   @unique
+  password      String
+  role_id       Int
+  status        Boolean  @default(true)
+  tenant_id     Int
+  supervisor_id Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @onCreate(now()) @onUpdate(now())
+
+  tenant        Tenant   @relation(fields: [tenant_id], references: [id])
+  rol           Role     @relation(fields: [role_id], references: [id])
+  supervisor    User?    @relation("UserToSupervisor", fields: [supervisor_id], references: [id])
+  subordinados  User[]   @relation("UserToSupervisor")
+  interacciones Interaccion[]
+  gestiones     Gestion[]
+  indicadores_gestion  IndicadoresGestion[]
+
+  @@map("user")
+}
+
+model Role {
+  id         Int      @id @default(autoincrement())
+  nombre_rol String
+  tenant_id  Int
+  tenant     Tenant   @relation(fields: [tenant_id], references: [id])
+  usuarios   User[]
+
+  @@map("roles")
+}
+
+model Lead {
+  id                 Int       @id @default(autoincrement())
+  tenant_id          Int
+  primer_nombre      String
+  segundo_nombre     String?
+  apellido_paterno   String
+  apellido_materno   String?
+  cliente_potencial  Boolean   @default(true)
+  tipo_documento     String
+  numero_documento   String
+  genero             String?
+  fecha_nacimiento   DateTime?
+  edad               Int?
+  estado_civil       String?
+  contacto_id        Int?      @unique
+  academica_id       Int?      @unique
+  laboral_id         Int?      @unique
+  marketing_id       Int?      @unique
+
+  tenant             Tenant    @relation(fields: [tenant_id], references: [id])
+  gestiones          Gestion[]
+  interacciones      Interaccion[]
+  companions         Companion[]
+
+  contacto_rel         Contacto?             @relation(fields: [contacto_id], references: [id])
+  academica_rel        InformacionAcademica? @relation(fields: [academica_id], references: [id])
+  laboral_rel          InformacionLaboral?   @relation(fields: [laboral_id], references: [id])
+  marketing_rel        Marketing?            @relation(fields: [marketing_id], references: [id])
+  indicadores_gestion  IndicadoresGestion?
+
+  datos_adicionales  Json?     
+
+  @@map("lead")
+}
+
+model Gestion {
+  id             Int       @id @default(autoincrement())
+  tenant_id      Int
+  lead_id        Int
+  user_id        Int       // El propietario/asesor
+  comercial_id   Int
+  stage_id       Int
+  estado         String
+  nivel_interes  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime @onCreate(now()) @onUpdate(now())
+
+  tenant         Tenant    @relation(fields: [tenant_id], references: [id])
+  lead           Lead      @relation(fields: [lead_id], references: [id])
+  propietario    User      @relation(fields: [user_id], references: [id])
+  stage          Stage     @relation(fields: [stage_id], references: [id])
+  ventas         Venta[]
+  interacciones  Interaccion[]
+
+  comercial            Comercial @relation(fields: [comercial_id], references: [id])
+
+  @@map("gestion")
+}
+
+model Venta {
+  id                      Int      @id @default(autoincrement())
+  tenant_id               Int
+  gestion_id              Int
+  monto_final             Decimal
+  saldo_pendiente         Decimal
+  cantidad_personas_final Int
+  estado_venta            String
+  fecha_inicio            DateTime? // Para el calendario de servicios
+  fecha_fin               DateTime? // Para el calendario de servicios
+
+  tenant                  Tenant   @relation(fields: [tenant_id], references: [id])
+  gestion                 Gestion  @relation(fields: [gestion_id], references: [id])
+  pagos                   Pago[]
+
+  @@index([tenant_id, fecha_inicio]) // Índice crítico para el rendimiento del calendario
+  @@map("ventas")
+}
+
+model Pago {
+  id               Int      @id @default(autoincrement())
+  venta_id         Int
+  monto_pagado     Decimal
+  concepto         String
+  metodo_pago      String
+  fecha_pago       DateTime @default(now())
+  comprobante_url  String?
+
+  venta            Venta    @relation(fields: [venta_id], references: [id])
+
+  @@map("pago")
+}
+
+model Interaccion {
+  id                Int      @id @default(autoincrement())
+  tenant_id         Int
+  lead_id           Int
+  user_id           Int
+  gestion_id        Int?
+  tipo_interaccion  String
+  comentarios_texto String?
+  duracion          Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @onCreate(now()) @onUpdate(now())
+
+  lead              Lead     @relation(fields: [lead_id], references: [id])
+  user              User     @relation(fields: [user_id], references: [id])
+  gestion           Gestion? @relation(fields: [gestion_id], references: [id])
+
+  @@map("interacciones")
+}
+
+model Stage {
+  id          Int       @id @default(autoincrement())
+  tenant_id   Int
+  nombre_fase String
+  orden       Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime @onCreate(now()) @onUpdate(now())
+
+  tenant      Tenant    @relation(fields: [tenant_id], references: [id])
+  gestiones   Gestion[]
+
+  @@map("stages")
+}
+
+model Companion {
+  id                  Int     @id @default(autoincrement())
+  lead_id             Int
+  parentesco_relacion String
+  nombre              String
+  apellido            String
+  tipo_documento      String?
+  numero_documento    String?
+  celular             String?
+  correo              String?
+
+  datos_adicionales   Json?   
+
+  lead                Lead    @relation(fields: [lead_id], references: [id])
+
+  @@map("companion")
+}
+
+model Comercial {
+  id             Int       @id @default(autoincrement())
+  unidad_negocio String?
+  producto       String?
+  tenant_id      Int
+
+  tenant         Tenant    @relation(fields: [tenant_id], references: [id])
+  gestiones      Gestion[]
+
+  @@map("comercial")
+}
+
+model Contacto {
+  id                         Int     @id @default(autoincrement())
+  celular_1                  String?
+  zona                       String?
+  distrito                   String?
+  provincia                  String?
+  departamento               String?
+  pais                       String?
+  direccion                  String?
+  correo_2                   String?
+  correo_1                   String?
+  celular_2                  String?
+  horario_preferido_contacto String?
+
+  lead                       Lead?
+
+  @@map("contacto")
+}
+
+model InformacionAcademica {
+  id                    Int     @id @default(autoincrement())
+  nivel_estudios        String?
+  institucion_educativa String?
+  grado_estudio_actual  String?
+  ano_egreso            String?
+  carrera_especialidad  String?
+
+  lead                  Lead?
+
+  @@map("informacion_academica")
+}
+
+model InformacionLaboral {
+  id               Int     @id @default(autoincrement())
+  lugar_trabajo    String?
+  cargo            String?
+  profesion        String?
+  sector_economico String?
+
+  lead             Lead?
+
+  @@map("informacion_laboral")
+}
+
+model Marketing {
+  id                    Int     @id @default(autoincrement())
+  campaign_origin       String?
+  fuente                String?
+  utm_campaign          String?
+  utm_medium            String?
+  utm_source            String?
+  utm_content           String?
+  utm_term              String?
+  utm_id                String?
+  url_referencia        String?
+  fuente_heredada       String?
+  utm_campaign_heredada String?
+  utm_id_heredada       String?
+  utm_term_heredada     String?
+  utm_content_heredada  String?
+  utm_source_heredada   String?
+  utm_medium_heredada   String?
+
+  lead                  Lead?
+
+  @@map("marketing")
+}
+
+model IndicadoresGestion {
+  id                           Int       @id @default(autoincrement())
+  modificado_por               Int?
+  lead_id                      Int       @unique
+  tenant_id                    Int
+  fecha_creacion               DateTime  @default(now())
+  fecha_primer_contacto        DateTime?
+  tiempo_primer_contacto_min   Int?
+  fecha_ultimo_contacto        DateTime?
+  dias_sin_relacionamiento     Int?
+  fecha_transicion_fase        DateTime?
+  tiempo_transicion_fase_dias  Int?
+  fecha_promesa_pago           DateTime?
+  tiempo_maduracion_dias       Int?
+  contador_total_interacciones Int       @default(0)
+  contador_llamadas            Int       @default(0)
+  contador_llamadas_efectivas  Int       @default(0)
+  contador_whatsapp            Int       @default(0)
+  contador_correos             Int       @default(0)
+  contador_duplicados          Int       @default(0)
+
+  usuario_modificador          User?     @relation(fields: [modificado_por], references: [id])
+  lead                         Lead      @relation(fields: [lead_id], references: [id])
+  tenant                       Tenant    @relation(fields: [tenant_id], references: [id])
+
+  @@map("indicadores_gestion")
+}

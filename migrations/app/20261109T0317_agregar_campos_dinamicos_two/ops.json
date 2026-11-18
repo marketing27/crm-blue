@@ -1,0 +1,122 @@
+[
+  {
+    "id": "column.public.companion.datos_adicionales",
+    "label": "Add column \"datos_adicionales\" to \"companion\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "datos_adicionales",
+        "table": "companion"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"datos_adicionales\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "companion",
+          "datos_adicionales"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"datos_adicionales\" on \"companion\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"datos_adicionales\"",
+        "sql": "ALTER TABLE \"public\".\"companion\" ADD COLUMN \"datos_adicionales\" json"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"datos_adicionales\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "companion",
+          "datos_adicionales"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"datos_adicionales\" on \"companion\""
+        }
+      },
+      {
+        "description": "verify column \"datos_adicionales\" has type \"json\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "companion",
+          "datos_adicionales",
+          "json"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.lead.datos_adicionales",
+    "label": "Add column \"datos_adicionales\" to \"lead\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "datos_adicionales",
+        "table": "lead"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"datos_adicionales\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "lead",
+          "datos_adicionales"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"datos_adicionales\" on \"lead\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"datos_adicionales\"",
+        "sql": "ALTER TABLE \"public\".\"lead\" ADD COLUMN \"datos_adicionales\" json"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"datos_adicionales\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "lead",
+          "datos_adicionales"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"datos_adicionales\" on \"lead\""
+        }
+      },
+      {
+        "description": "verify column \"datos_adicionales\" has type \"json\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "lead",
+          "datos_adicionales",
+          "json"
+        ]
+      }
+    ]
+  }
+]
