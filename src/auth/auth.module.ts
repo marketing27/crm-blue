@@ -11,7 +11,7 @@ import { PrismaModule } from '../prisma/prisma.module.js';
     PrismaModule,
     PassportModule,
     JwtModule.register({
-      secret: 'CRM_BLUE_SECRET_MVP_2026',
+      secret: process.env.JWT_SECRET ?? 'CRM_BLUE_SECRET_MVP_2026',
       signOptions: { expiresIn: '8h' }, // El token dura 8 horas
     }),
   ],

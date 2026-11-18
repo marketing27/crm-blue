@@ -8,7 +8,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'CRM_BLUE_SECRET_MVP_2026', // En prod irá a un .env
+      secretOrKey: process.env.JWT_SECRET ?? 'CRM_BLUE_SECRET_MVP_2026', // En prod irá a un .env
     });
   }
 
