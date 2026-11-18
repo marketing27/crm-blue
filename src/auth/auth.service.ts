@@ -10,9 +10,10 @@ export class AuthService {
   async login(correo: string, pass: string) {
     // Buscamos al usuario (usamos findFirst con as any por la versión RC)
     const user = await (this.prisma.client.orm.public.User.first as any)({
-      where: { correo, status: true }
+      correo: correo,
+      status: true
     });
-
+    
     if (!user) throw new UnauthorizedException('Credenciales inválidas');
 
     // Comparamos el hash de la BD con el password ingresado

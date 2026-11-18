@@ -1,0 +1,143 @@
+[
+  {
+    "id": "alterNullability.dropNotNull.lead.apellido_paterno",
+    "label": "Drop NOT NULL on \"lead\".\"apellido_paterno\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "apellido_paterno",
+        "table": "lead"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"apellido_paterno\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "lead",
+          "apellido_paterno"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"apellido_paterno\" on \"lead\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop NOT NULL on \"apellido_paterno\"",
+        "sql": "ALTER TABLE \"public\".\"lead\" ALTER COLUMN \"apellido_paterno\" DROP NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"apellido_paterno\" is nullable",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "lead",
+          "apellido_paterno",
+          "YES"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.dropNotNull.lead.numero_documento",
+    "label": "Drop NOT NULL on \"lead\".\"numero_documento\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "numero_documento",
+        "table": "lead"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"numero_documento\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "lead",
+          "numero_documento"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"numero_documento\" on \"lead\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop NOT NULL on \"numero_documento\"",
+        "sql": "ALTER TABLE \"public\".\"lead\" ALTER COLUMN \"numero_documento\" DROP NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"numero_documento\" is nullable",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "lead",
+          "numero_documento",
+          "YES"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.dropNotNull.lead.tipo_documento",
+    "label": "Drop NOT NULL on \"lead\".\"tipo_documento\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "tipo_documento",
+        "table": "lead"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"tipo_documento\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "lead",
+          "tipo_documento"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"tipo_documento\" on \"lead\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop NOT NULL on \"tipo_documento\"",
+        "sql": "ALTER TABLE \"public\".\"lead\" ALTER COLUMN \"tipo_documento\" DROP NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"tipo_documento\" is nullable",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "lead",
+          "tipo_documento",
+          "YES"
+        ]
+      }
+    ]
+  }
+]

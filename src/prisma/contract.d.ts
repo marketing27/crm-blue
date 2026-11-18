@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'eb2138ff43b66c8e9293be0720fa7ef3f575e973c59a31a5c31f4f3da87f0fbd'>;
+  StorageHashBase<'00b93daece936d338393b453b056a133a5b5f9e3c8dc28986665061c37c26a59'>;
 export type ExecutionHash =
   ExecutionHashBase<'b6d99e0721a55dfe147f6bc3a5edfe77eefd1ae42422c475848bed44600b91a2'>;
 export type ProfileHash =
@@ -1511,7 +1511,7 @@ type ContractBase = Omit<
                 readonly apellido_paterno: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
+                  readonly nullable: true;
                   readonly many: false;
                 };
                 readonly cliente_potencial: {
@@ -1585,7 +1585,7 @@ type ContractBase = Omit<
                 readonly numero_documento: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
+                  readonly nullable: true;
                   readonly many: false;
                 };
                 readonly primer_nombre: {
@@ -1609,7 +1609,7 @@ type ContractBase = Omit<
                 readonly tipo_documento: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
+                  readonly nullable: true;
                   readonly many: false;
                 };
               };
@@ -3140,7 +3140,7 @@ type ContractBase = Omit<
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly apellido_paterno: {
-                readonly nullable: false;
+                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly cliente_potencial: {
@@ -3187,7 +3187,7 @@ type ContractBase = Omit<
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
               readonly numero_documento: {
-                readonly nullable: false;
+                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly primer_nombre: {
@@ -3203,7 +3203,7 @@ type ContractBase = Omit<
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
               readonly tipo_documento: {
-                readonly nullable: false;
+                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
             };

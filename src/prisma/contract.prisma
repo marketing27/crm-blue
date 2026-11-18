@@ -75,11 +75,11 @@ model Lead {
   tenant_id          Int
   primer_nombre      String
   segundo_nombre     String?
-  apellido_paterno   String
+  apellido_paterno   String?
   apellido_materno   String?
   cliente_potencial  Boolean   @default(true)
-  tipo_documento     String
-  numero_documento   String
+  tipo_documento     String?
+  numero_documento   String?
   genero             String?
   fecha_nacimiento   DateTime?
   edad               Int?

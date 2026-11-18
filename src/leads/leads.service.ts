@@ -45,10 +45,24 @@ export class LeadsService {
                 })
             } : {}),
 
-            ...(data.utm_campaign || data.fuente ? {
+            ...(data.utm_campaign || data.fuente || data.utm_source ? {
                 marketing_rel: (m) => m.create({
-                    utm_campaign: data.utm_campaign,
+                    campaign_origin: data.campaign_origin,
                     fuente: data.fuente,
+                    utm_campaign: data.utm_campaign,
+                    utm_medium: data.utm_medium,
+                    utm_source: data.utm_source,
+                    utm_content: data.utm_content,
+                    utm_term: data.utm_term,
+                    utm_id: data.utm_id,
+                    url_referencia: data.url_referencia,
+                    fuente_heredada: data.fuente_heredada,
+                    utm_campaign_heredada: data.utm_campaign_heredada,
+                    utm_id_heredada: data.utm_id_heredada,
+                    utm_term_heredada: data.utm_term_heredada,
+                    utm_content_heredada: data.utm_content_heredada,
+                    utm_source_heredada: data.utm_source_heredada,
+                    utm_medium_heredada: data.utm_medium_heredada,
                 })
             } : {}),
         });

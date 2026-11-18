@@ -14,7 +14,7 @@ export class TenantService {
     // 2. Generar la API Key cruda y su hash
     // Genera algo como: crm_live_a1b2c3d4e5f6...
     const rawApiKey = `crm_live_${crypto.randomBytes(16).toString('hex')}`; 
-    const prefix = rawApiKey.substring(0, 13); // Guardamos el prefijo visual "crm_live_a1b..."
+    const prefix = rawApiKey.substring(0, 8); // Guardamos el prefijo visual "crm_live_a1b..."
     const hashedApiKey = crypto.createHash('sha256').update(rawApiKey).digest('hex');
 
     // 3. Transacción atómica Prisma 8
@@ -28,7 +28,7 @@ export class TenantService {
         apellidos: data.adminApellidos,
         correo: data.adminCorreo,
         password: hashedPassword,
-        role_id: 1, // Asumiendo que 1 es el ID del rol Administrador
+        role_id: 3, // Asumiendo que 1 es el ID del rol Administrador
       }),
 
       // Creamos la API Key anidada

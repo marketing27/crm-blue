@@ -1345,7 +1345,7 @@
                 }
               },
               "apellido_paterno": {
-                "nullable": false,
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -1422,7 +1422,7 @@
                 }
               },
               "numero_documento": {
-                "nullable": false,
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -1450,7 +1450,7 @@
                 }
               },
               "tipo_documento": {
-                "nullable": false,
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -3760,7 +3760,7 @@
                 "apellido_paterno": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
-                  "nullable": false
+                  "nullable": true
                 },
                 "cliente_potencial": {
                   "codecId": "pg/bool@1",
@@ -3823,7 +3823,7 @@
                 "numero_documento": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
-                  "nullable": false
+                  "nullable": true
                 },
                 "primer_nombre": {
                   "codecId": "pg/text@1",
@@ -3843,7 +3843,7 @@
                 "tipo_documento": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
-                  "nullable": false
+                  "nullable": true
                 }
               },
               "foreignKeys": [
@@ -4687,7 +4687,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "eb2138ff43b66c8e9293be0720fa7ef3f575e973c59a31a5c31f4f3da87f0fbd"
+    "storageHash": "00b93daece936d338393b453b056a133a5b5f9e3c8dc28986665061c37c26a59"
   },
   "execution": {
     "executionHash": "b6d99e0721a55dfe147f6bc3a5edfe77eefd1ae42422c475848bed44600b91a2",
