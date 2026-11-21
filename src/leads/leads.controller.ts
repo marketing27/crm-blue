@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, Req, UseGuards, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { LeadsService } from './leads.service.js';
 import { CreateLeadDto } from './dto/create-lead.dto.js';
 import { ApiKeyGuard } from '../api-keys/api-keys.guard.js';
@@ -20,4 +20,11 @@ export class LeadsController {
     findAll(@Req() request:any) {
         return this.leadsService.getLeadsByTenant(request.user.tenantId);
     }
+
+    @Delete(':id')
+    @UseGuards(AuthGuard('jwt'))
+    remove(@Req() request: any, @Param('id', ParseIntPipe) id: number) {
+        return this.leadsService.deleteLead(request.user.tenantId, id);
+    }
+
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateLeadDto } from './dto/create-lead.dto.js';
 
@@ -74,4 +74,68 @@ export class LeadsService {
             tenant_id: tenantId,
         }).all();
     }
+
+    async deleteLead(tenantId: number, leadId: number) {
+        const orm = (this.prisma.client.orm.public as any);
+
+        // 1. Verificar que el lead exista y pertenezca al tenant autenticado
+        const lead = await orm.Lead.first({
+            id: leadId,
+            tenant_id: tenantId,
+        });
+
+        if (!lead) {
+            throw new NotFoundException('Lead no encontrado o no pertenece a tu organización.');
+        }
+
+        // 2. Eliminar dependencias hijas (si el lead ya tuvo gestiones, ventas o interacciones)
+        const gestiones = await orm.Gestion.findMany({
+            where: { lead_id: leadId },
+        });
+
+        if (gestiones?.length) {
+            const gestionIds = gestiones.map((g: any) => g.id);
+
+            const ventas = await orm.Venta.findMany({
+                where: { gestion_id: { in: gestionIds } },
+            });
+
+            if (ventas?.length) {
+                const ventaIds = ventas.map((v: any) => v.id);
+                await orm.Pago.deleteAll({ venta_id: { in: ventaIds } });
+                await orm.Venta.deleteAll({ id: { in: ventaIds } });
+            }
+
+            await orm.Interaccion.deleteAll({ gestion_id: { in: gestionIds } });
+            await orm.Gestion.deleteAll({ lead_id: leadId });
+        }
+
+        await orm.Interaccion.deleteAll({ lead_id: leadId });
+        await orm.Companion.deleteAll({ lead_id: leadId });
+        await orm.IndicadoresGestion.deleteAll({ lead_id: leadId });
+
+        // 3. Eliminar el Lead (libera las referencias hacia contacto, marketing, académica y laboral)
+        await orm.Lead.delete({ id: leadId });
+
+        // 4. Eliminar los registros 1 a 1 asociados si existen
+        if (lead.contacto_id) {
+            await orm.Contacto.delete({ id: lead.contacto_id });
+        }
+        if (lead.marketing_id) {
+            await orm.Marketing.delete({ id: lead.marketing_id });
+        }
+        if (lead.academica_id) {
+            await orm.InformacionAcademica.delete({ id: lead.academica_id });
+        }
+        if (lead.laboral_id) {
+            await orm.InformacionLaboral.delete({ id: lead.laboral_id });
+        }
+
+        return {
+            deleted: true,
+            id: leadId,
+            mensaje: 'Lead y todos sus registros asociados fueron eliminados correctamente.',
+        };
+    }
+
 }
