@@ -69,10 +69,35 @@ export class LeadsService {
     }
 
     async getLeadsByTenant(tenantId: number) {
-        // Usamos .find() para búsquedas condicionales de múltiples registros
-        return this.prisma.client.orm.public.Lead.where({
+        const orm = this.prisma.client.orm.public as any;
+
+        const leads = await orm.Lead.where({
             tenant_id: tenantId,
         }).all();
+
+        const leadsCompletos = await Promise.all(
+            leads.map(async (lead: any) => {
+                const [contactos, marketings, companions] = await Promise.all([
+                    lead.contacto_id
+                        ? orm.Contacto.where({ id: lead.contacto_id }).all()
+                        : Promise.resolve([]),
+                    lead.marketing_id
+                        ? orm.Marketing.where({ id: lead.marketing_id }).all()
+                        : Promise.resolve([]),
+                    orm.Companion.where({ lead_id: lead.id }).all(),
+                ]);
+
+                return {
+                    ...lead,
+                    contacto_rel: contactos?.[0] || null,
+                    marketing_rel: marketings?.[0] || null,
+                    companions: companions || [],
+                };
+            })
+        );
+
+        // Ordenar del lead más reciente al más antiguo
+        return leadsCompletos.sort((a, b) => b.id - a.id);
     }
 
     async deleteLead(tenantId: number, leadId: number) {
