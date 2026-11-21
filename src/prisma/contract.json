@@ -1365,6 +1365,13 @@
                   "kind": "scalar"
                 }
               },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
               "datos_adicionales": {
                 "nullable": true,
                 "type": {
@@ -1616,6 +1623,9 @@
                 },
                 "contacto_id": {
                   "column": "contacto_id"
+                },
+                "createdAt": {
+                  "column": "createdAt"
                 },
                 "datos_adicionales": {
                   "column": "datos_adicionales"
@@ -3776,6 +3786,15 @@
                   "dataType": "pg/int4",
                   "nullable": true
                 },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
                 "datos_adicionales": {
                   "codecId": "pg/json@1",
                   "dataType": "pg/json",
@@ -4687,7 +4706,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "00b93daece936d338393b453b056a133a5b5f9e3c8dc28986665061c37c26a59"
+    "storageHash": "c4be9f6bbe906fe543f4661e323d96f6b23052e52c4cd7c9dc0ce15379f0f3fc"
   },
   "execution": {
     "executionHash": "b6d99e0721a55dfe147f6bc3a5edfe77eefd1ae42422c475848bed44600b91a2",

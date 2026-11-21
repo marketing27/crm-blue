@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'00b93daece936d338393b453b056a133a5b5f9e3c8dc28986665061c37c26a59'>;
+  StorageHashBase<'c4be9f6bbe906fe543f4661e323d96f6b23052e52c4cd7c9dc0ce15379f0f3fc'>;
 export type ExecutionHash =
   ExecutionHashBase<'b6d99e0721a55dfe147f6bc3a5edfe77eefd1ae42422c475848bed44600b91a2'>;
 export type ProfileHash =
@@ -406,6 +406,7 @@ export namespace Models {
     apellido_paterno: FieldOutputTypes['public']['Lead']['apellido_paterno'];
     cliente_potencial: FieldOutputTypes['public']['Lead']['cliente_potencial'];
     contacto_id: FieldOutputTypes['public']['Lead']['contacto_id'];
+    createdAt: FieldOutputTypes['public']['Lead']['createdAt'];
     datos_adicionales: FieldOutputTypes['public']['Lead']['datos_adicionales'];
     edad: FieldOutputTypes['public']['Lead']['edad'];
     estado_civil: FieldOutputTypes['public']['Lead']['estado_civil'];
@@ -1528,6 +1529,13 @@ type ContractBase = Omit<
                   readonly dataType: 'pg/int4';
                   readonly codecId: 'pg/int4@1';
                   readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                   readonly many: false;
                 };
                 readonly datos_adicionales: {
@@ -3151,6 +3159,13 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
               readonly datos_adicionales: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
@@ -3323,6 +3338,7 @@ type ContractBase = Omit<
                 readonly apellido_paterno: { readonly column: 'apellido_paterno' };
                 readonly cliente_potencial: { readonly column: 'cliente_potencial' };
                 readonly contacto_id: { readonly column: 'contacto_id' };
+                readonly createdAt: { readonly column: 'createdAt' };
                 readonly datos_adicionales: { readonly column: 'datos_adicionales' };
                 readonly edad: { readonly column: 'edad' };
                 readonly estado_civil: { readonly column: 'estado_civil' };

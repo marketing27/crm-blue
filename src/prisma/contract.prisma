@@ -102,6 +102,8 @@ model Lead {
 
   datos_adicionales  Json?     
 
+  createdAt          DateTime  @default(now())
+
   @@map("lead")
 }
 
