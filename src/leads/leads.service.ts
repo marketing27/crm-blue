@@ -76,59 +76,57 @@ export class LeadsService {
     }
 
     async deleteLead(tenantId: number, leadId: number) {
-        const orm = (this.prisma.client.orm.public as any);
+        const orm = this.prisma.client.orm.public as any;
 
-        // 1. Verificar que el lead exista y pertenezca al tenant autenticado
-        const lead = await orm.Lead.first({
+        // 1. Verificar que el lead exista y pertenezca al tenant
+        const leads = await orm.Lead.where({
             id: leadId,
             tenant_id: tenantId,
-        });
+        }).all();
+
+        const lead = leads?.[0];
 
         if (!lead) {
             throw new NotFoundException('Lead no encontrado o no pertenece a tu organización.');
         }
 
-        // 2. Eliminar dependencias hijas (si el lead ya tuvo gestiones, ventas o interacciones)
-        const gestiones = await orm.Gestion.findMany({
-            where: { lead_id: leadId },
-        });
+        // 2. Eliminar dependencias hijas (si existen)
+        const gestiones = await orm.Gestion.where({ lead_id: leadId }).all();
 
         if (gestiones?.length) {
-            const gestionIds = gestiones.map((g: any) => g.id);
+            for (const gestion of gestiones) {
+                const ventas = await orm.Venta.where({ gestion_id: gestion.id }).all();
 
-            const ventas = await orm.Venta.findMany({
-                where: { gestion_id: { in: gestionIds } },
-            });
+                for (const venta of ventas) {
+                    await orm.Pago.where({ venta_id: venta.id }).delete();
+                }
 
-            if (ventas?.length) {
-                const ventaIds = ventas.map((v: any) => v.id);
-                await orm.Pago.deleteAll({ venta_id: { in: ventaIds } });
-                await orm.Venta.deleteAll({ id: { in: ventaIds } });
+                await orm.Venta.where({ gestion_id: gestion.id }).delete();
+                await orm.Interaccion.where({ gestion_id: gestion.id }).delete();
             }
 
-            await orm.Interaccion.deleteAll({ gestion_id: { in: gestionIds } });
-            await orm.Gestion.deleteAll({ lead_id: leadId });
+            await orm.Gestion.where({ lead_id: leadId }).delete();
         }
 
-        await orm.Interaccion.deleteAll({ lead_id: leadId });
-        await orm.Companion.deleteAll({ lead_id: leadId });
-        await orm.IndicadoresGestion.deleteAll({ lead_id: leadId });
+        await orm.Interaccion.where({ lead_id: leadId }).delete();
+        await orm.Companion.where({ lead_id: leadId }).delete();
+        await orm.IndicadoresGestion.where({ lead_id: leadId }).delete();
 
-        // 3. Eliminar el Lead (libera las referencias hacia contacto, marketing, académica y laboral)
-        await orm.Lead.delete({ id: leadId });
+        // 3. Eliminar el Lead principal
+        await orm.Lead.where({ id: leadId }).delete();
 
-        // 4. Eliminar los registros 1 a 1 asociados si existen
+        // 4. Eliminar los registros 1 a 1 asociados
         if (lead.contacto_id) {
-            await orm.Contacto.delete({ id: lead.contacto_id });
+            await orm.Contacto.where({ id: lead.contacto_id }).delete();
         }
         if (lead.marketing_id) {
-            await orm.Marketing.delete({ id: lead.marketing_id });
+            await orm.Marketing.where({ id: lead.marketing_id }).delete();
         }
         if (lead.academica_id) {
-            await orm.InformacionAcademica.delete({ id: lead.academica_id });
+            await orm.InformacionAcademica.where({ id: lead.academica_id }).delete();
         }
         if (lead.laboral_id) {
-            await orm.InformacionLaboral.delete({ id: lead.laboral_id });
+            await orm.InformacionLaboral.where({ id: lead.laboral_id }).delete();
         }
 
         return {
